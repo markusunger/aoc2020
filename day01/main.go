@@ -37,7 +37,7 @@ func part1(values PuzzleInput) int {
 	leftPointer := 0
 	rightPointer := len(values) - 1
 
-	for solution == 0  {
+	for solution == 0 {
 		current := values[leftPointer] + values[rightPointer]
 
 		if current == Target {
@@ -63,7 +63,7 @@ func part2(values PuzzleInput) (solution int) {
 	for i, num1 := range values {
 		for j, num2 := range values[i+1:] {
 			for _, num3 := range values[j+1:] {
-				if num1 + num2 + num3 == Target {
+				if num1+num2+num3 == Target {
 					solution = num1 * num2 * num3
 					return
 				}
