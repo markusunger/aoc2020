@@ -1,3 +1,4 @@
+// solves https://adventofcode.com/2020/day/2
 package main
 
 import (
@@ -53,8 +54,20 @@ func part1(input PuzzleInput) int {
 	return validCount
 }
 
+func part2(input PuzzleInput) int {
+	validCount := 0
+	for _, item := range *input {
+		char1 := string(item.password[item.lowerBound-1])
+		char2 := string(item.password[item.upperBound-1])
+		if (char1 == item.letter || char2 == item.letter) && char1 != char2 {
+			validCount++
+		}
+	}
+	return validCount
+}
+
 func main() {
 	input := getInput()
-	fmt.Println("Part 1 solution", part1(input))
-	// fmt.Println("Part 2 solution", part2(input))
+	fmt.Println("Part 1 solution:", part1(input))
+	fmt.Println("Part 2 solution:", part2(input))
 }
