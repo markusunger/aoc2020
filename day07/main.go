@@ -17,23 +17,25 @@ type PuzzleInput map[string][]BagContains
 func main() {
 	input := getInput()
 	fmt.Println("Part 1 solution:", part1(input))
+	fmt.Println("Part 2 solution:", part2(input))
 }
 
 func part1(input PuzzleInput) (result int) {
 	for key := range input {
-		fmt.Printf("Checking %s ...\n", key)
 		if checkColor(key, input) {
-			fmt.Printf("... and %s contains a shiny gold bag", key)
 			result++
 		}
-		fmt.Printf("\n\n")
 	}
+	return
+}
+
+func part2(input PuzzleInput) (result int) {
+	result = checkAmount("shiny gold", input)
 	return
 }
 
 // recursively checks whether a bag color can contain shiny gold bag
 func checkColor(color string, input PuzzleInput) bool {
-	fmt.Printf("  %s contains %q\n", color, input[color])
 	// handle dead ends (a color that does not contain any others)
 	if len(input[color]) == 0 {
 		return false
@@ -42,15 +44,26 @@ func checkColor(color string, input PuzzleInput) bool {
 	// check to see if the color contains a shiny gold bag
 	for _, content := range input[color] {
 		if content.name == "shiny gold" {
-			fmt.Printf("  !! Shiny gold found!\n")
 			return true
 		}
+		// check if the color contains other colors that contain
+		// a shiny bag (recursion for the win!)
 		if checkColor(content.name, input) {
 			return true
 		}
 
 	}
 	return false
+}
+
+// recursively checks how many bags a given color must contain
+func checkAmount(color string, input PuzzleInput) int {
+	sum := 0
+	for _, content := range input[color] {
+		sum += content.amount
+		sum += content.amount * checkAmount(content.name, input)
+	}
+	return sum
 }
 
 // parses input file and creates a hash map with the container color
