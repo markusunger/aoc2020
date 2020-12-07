@@ -16,8 +16,8 @@ type PuzzleInput map[string][]BagContains
 
 func main() {
 	input := getInput()
-	fmt.Println("Part 1 solution:", part1(input))
-	fmt.Println("Part 2 solution:", part2(input))
+	fmt.Println("Part 1 solution:", part1(*input))
+	fmt.Println("Part 2 solution:", part2(*input))
 }
 
 func part1(input PuzzleInput) (result int) {
@@ -69,7 +69,7 @@ func checkAmount(color string, input PuzzleInput) int {
 // parses input file and creates a hash map with the container color
 // as the key and a slice of its contents (in the form of a struct with
 // a name and an amount field)
-func getInput() PuzzleInput {
+func getInput() *PuzzleInput {
 	content, err := ioutil.ReadFile("input")
 	if err != nil {
 		panic(err)
@@ -109,5 +109,5 @@ func getInput() PuzzleInput {
 		input[container] = containerContent
 	}
 
-	return input
+	return &input
 }
