@@ -1,4 +1,5 @@
 import { getInput } from '../utils/';
+import { max, min, sum } from 'lodash';
 
 // generator function for retrieving values
 const getNextValue = function* (values: number[]) {
@@ -47,4 +48,28 @@ const part1 = async () => {
     }
 };
 
-part1();
+const part2 = async (invalidNumber: number) => {
+    // get numbers from input
+    const input = await getInput('input');
+    const values = input.map((value) => parseInt(value, 10));
+
+    // check all subsets of subsequent numbers if their sum matches the target number
+    for (let i = 0; i <= values.length; i += 1) {
+        for (let j = 1; j < values.length; j += 1) {
+            const subset = values.slice(i, j);
+            if (subset.length >= 2) {
+                if (sum(subset) === invalidNumber) {
+                    console.log(
+                        'Part 2 solution: ',
+                        sum([min(subset), max(subset)])
+                    );
+                }
+            }
+        }
+    }
+};
+
+(async () => {
+    const invalid = await part1();
+    part2(invalid);
+})();
