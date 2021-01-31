@@ -30,4 +30,30 @@ const part1 = async () => {
     console.log('Part 1 solution: ', compute.ones * compute.threes);
 };
 
+const part2 = async () => {
+    type Memoize = Map<number, number>;
+
+    const input = await getInput('input');
+    const adapters = input.map(Number);
+
+    const builtinAdapter = max(adapters) + 3;
+
+    // add builtin adapter to sorted list of adapters
+    const sortedAdapters = [...adapters.sort((a, b) => a - b), builtinAdapter];
+
+    // count number of ways to reach each joltage value by looking it up in a Map
+    // that starts with the initial charger joltage (0)
+    const result = sortedAdapters.reduce((acc, adapter): Memoize => {
+        const count =
+            (acc.get(adapter - 1) || 0) +
+            (acc.get(adapter - 2) || 0) +
+            (acc.get(adapter - 3) || 0);
+        acc.set(adapter, count);
+        return acc;
+    }, new Map([[0, 1]]) as Memoize);
+
+    console.log('Part 2 solution: ', result.get(builtinAdapter));
+};
+
 part1();
+part2();
