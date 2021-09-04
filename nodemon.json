@@ -1,7 +1,6 @@
 {
     "watch": ["./"],
     "ext": "ts,json",
-    "ignore": ["**/*.spec.ts"],
-    "exec": "npx ts-node ./day14/index.ts"
+    "ignore": ["**/*.spec.ts"]
   }
   
