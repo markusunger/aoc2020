@@ -1,3 +1,4 @@
+import { includes } from 'lodash';
 import { getInput } from '../utils';
 
 interface ValueRange {
@@ -49,28 +50,66 @@ const parseInput = (input: string[]): ParsedInput => {
     return { fields, ownTicket, nearbyTickets };
 };
 
-const part1 = (input: ParsedInput) => {
-    const ticketValues = input.nearbyTickets.flat();
-    const errorRate = ticketValues.reduce((rate, value) => {
-        let isValid = false;
-        const ranges = Object.values(input.fields);
+// helper for checking whether a value is valid in a given set of ValueRanges
+const valueMatchesRanges = (value: number, ranges: ValueRange[]) => {
+    return ranges.some((range) => value >= range.start && value <= range.end);
+};
 
-        for (let i = 0; i < ranges.length; i += 1) {
-            for (let j = 0; j < ranges[i].length; j += 1) {
-                if (value >= ranges[i][j].start && value <= ranges[i][j].end)
-                    isValid = true;
-                if (isValid) break;
-            }
-            if (isValid) break;
-        }
+// helper for determining invalid ticket values
+const getInvalidValues = (fields: TicketFields, ticket: number[]) => {
+    return ticket.filter(
+        (value) =>
+            !Object.entries(fields).some(([_, fieldRanges]) =>
+                valueMatchesRanges(value, fieldRanges)
+            )
+    );
+};
 
-        return isValid ? rate : rate + value;
-    }, 0);
+const part1 = (input: ParsedInput, showResult = true) => {
+    const errorRate = input.nearbyTickets
+        .flatMap((ticket) => getInvalidValues(input.fields, ticket))
+        .reduce((acc, value) => acc + value);
 
-    console.log('Part 1 solution: ', errorRate);
+    if (showResult) console.log('Part 1 solution: ', errorRate);
+};
+
+const part2 = (input: ParsedInput) => {
+    const validTickets = input.nearbyTickets.filter(
+        (ticket) => getInvalidValues(input.fields, ticket).length === 0
+    );
+
+    const fieldColumnMap = new Map<number, string>();
+    const fields = Object.entries(input.fields);
+
+    while (fieldColumnMap.size < fields.length) {
+        validTickets
+            .map((_, idx) => idx)
+            .filter((idx) => !fieldColumnMap.has(idx))
+            .forEach((idx) => {
+                const eligibleFields = fields.filter(
+                    ([fieldName, fieldRanges]) => {
+                        return (
+                            ![...fieldColumnMap.values()].includes(fieldName) &&
+                            validTickets.every((ticket) =>
+                                valueMatchesRanges(ticket[idx], fieldRanges)
+                            )
+                        );
+                    }
+                );
+                if (eligibleFields.length === 1)
+                    fieldColumnMap.set(idx, eligibleFields[0][0]);
+            });
+    }
+
+    const solution = input.ownTicket
+        .filter((_, idx) => fieldColumnMap.get(idx)!.startsWith('departure'))
+        .reduce((acc, value) => acc * value);
+
+    console.log('Part 2 solution is: ', solution);
 };
 
 (async () => {
     const input = parseInput(await getInput('day16/input'));
     part1(input);
+    part2(input);
 })();
